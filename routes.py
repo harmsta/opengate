@@ -44,6 +44,8 @@ def login():
 @main.route('/user', methods=['POST', 'GET'])
 def user():
     email = None
+    spotify_data = None
+    
     if 'user' in session:
         user_name = session['user']
         
@@ -65,8 +67,33 @@ def user():
         else:
             if 'email' in session:
                 email = session['email']
+        
+        found_user = User.query.filter_by(name=user_name).first()
+        
+        if found_user and found_user.spotify_access_token:
+            try:
+                access_token = spotify_service.check_and_refresh_token(found_user)
                 
-        return render_template('user.html', email=email)
+                current_track = spotify_service.get_currently_playing(access_token)
+                top_tracks = spotify_service.get_top_items(access_token, item_type='tracks', limit=5, time_range='short_term')
+                top_artists = spotify_service.get_top_items(access_token, item_type='artists', limit=5, time_range='medium_term')
+                top_genres = spotify_service.get_top_genres(access_token, limit=5, time_range='medium_term')
+                
+                spotify_data = {
+                    'current_track': current_track,
+                    'top_tracks': top_tracks,
+                    'top_artists': top_artists,
+                    'top_genres': top_genres,
+                    'connected': True
+                }
+            except Exception as e:
+                print(f"Error fetching Spotify data: {e}")
+                flash('Error loading Spotify data. Please try reconnecting your account.', 'warning')
+                spotify_data = {'connected': False}
+        else:
+            spotify_data = {'connected': False}
+                
+        return render_template('user.html', email=email, spotify_data=spotify_data)
     else:
         return redirect(url_for('main.login'))
 

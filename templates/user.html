@@ -14,44 +14,280 @@
          {% endif %}
     {% endwith %}
     
-    <div class="row justify-content-center mt-5">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-body">
-                    <h2 class="card-title">User Profile</h2>
-                    
-                    <!-- User Email Form -->
-                    <form action="#" method="post" class="mb-4">
-                        <div class="form-group">
-                            <label for="email">Email Address:</label>
-                            <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" value="{{email if email}}"/>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Update Email</button>
-                    </form>
-                    
-                    <hr>
-                    
-                    <!-- Spotify Connection Status -->
-                    <div class="mt-4">
-                        <h5>Spotify Connection</h5>
-                        {% if session.get('user') %}
-                            <p class="text-muted">Logged in as: <strong>{{ session.get('user') }}</strong></p>
-                        {% endif %}
+    <div class="container mt-4">
+        <!-- User Profile Card -->
+        <div class="row justify-content-center mb-4">
+            <div class="col-md-10">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h2 class="card-title"><i class="fas fa-user"></i> User Profile</h2>
                         
-                        <a href="{{ url_for('main.spotify_login') }}" class="btn btn-success">
-                            <i class="fab fa-spotify"></i> Connect Spotify Account
-                        </a>
-                        <p class="text-muted mt-2">Link your Spotify account to access personalized features</p>
-                    </div>
-                    
-                    <hr>
-                    
-                    <!-- Logout Button -->
-                    <div class="mt-4">
-                        <a href="{{ url_for('main.logout') }}" class="btn btn-danger">Logout</a>
+                        <!-- User Email Form -->
+                        <form action="#" method="post" class="mb-3">
+                            <div class="form-group">
+                                <label for="email">Email Address:</label>
+                                <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" value="{{email if email}}"/>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Update Email
+                            </button>
+                        </form>
+                        
+                        <hr>
+                        
+                        <!-- Spotify Connection Status -->
+                        <div class="mt-3">
+                            <h5><i class="fab fa-spotify"></i> Spotify Connection</h5>
+                            {% if session.get('user') %}
+                                <p class="text-muted">Logged in as: <strong>{{ session.get('user') }}</strong></p>
+                            {% endif %}
+                            
+                            {% if spotify_data and spotify_data.connected %}
+                                <p class="text-success">
+                                    <i class="fas fa-check-circle"></i> Spotify Connected
+                                </p>
+                            {% else %}
+                                <a href="{{ url_for('main.spotify_login') }}" class="btn btn-success btn-lg">
+                                    <i class="fab fa-spotify"></i> Connect Spotify Account
+                                </a>
+                                <p class="text-muted mt-2">
+                                    <i class="fas fa-info-circle"></i> Link your Spotify account to see your music statistics
+                                </p>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Logout Button -->
+                        <div class="mt-4">
+                            <a href="{{ url_for('main.logout') }}" class="btn btn-danger">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+        
+        <!-- Spotify Music Data (Only shown if connected) -->
+        {% if spotify_data and spotify_data.connected %}
+        
+        <!-- NOW PLAYING - Prominent Section -->
+        <div class="row justify-content-center mb-4">
+            <div class="col-md-10">
+                <div class="card border-success shadow-lg">
+                    <div class="card-header bg-success text-white">
+                        <h3 class="mb-0">
+                            <i class="fas fa-music"></i> Now Playing
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        {% if spotify_data.current_track %}
+                        <div class="row align-items-center">
+                            <div class="col-md-3 text-center">
+                                {% if spotify_data.current_track.album_image_url %}
+                                <img src="{{ spotify_data.current_track.album_image_url }}" 
+                                     class="img-fluid rounded shadow" 
+                                     alt="Album Art"
+                                     style="max-width: 200px;">
+                                {% else %}
+                                <div class="bg-secondary text-white d-flex align-items-center justify-content-center rounded" 
+                                     style="width: 200px; height: 200px;">
+                                    <i class="fas fa-music fa-5x"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-9">
+                                <h2 class="mb-2">{{ spotify_data.current_track.track_name }}</h2>
+                                <h4 class="text-muted mb-2">{{ spotify_data.current_track.artist_name }}</h4>
+                                <p class="text-muted"><i class="fas fa-compact-disc"></i> {{ spotify_data.current_track.album_name }}</p>
+                                
+                                <!-- Progress Bar -->
+                                <div class="mt-3">
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar bg-success" role="progressbar" 
+                                             style="width: {{ (spotify_data.current_track.progress_ms / spotify_data.current_track.duration_ms * 100) if spotify_data.current_track.duration_ms else 0 }}%">
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between mt-1">
+                                        <small>{{ '%d:%02d' % (spotify_data.current_track.progress_ms // 60000, (spotify_data.current_track.progress_ms // 1000) % 60) }}</small>
+                                        <small>{{ '%d:%02d' % (spotify_data.current_track.duration_ms // 60000, (spotify_data.current_track.duration_ms // 1000) % 60) }}</small>
+                                    </div>
+                                </div>
+                                
+                                {% if spotify_data.current_track.external_url %}
+                                <a href="{{ spotify_data.current_track.external_url }}" target="_blank" class="btn btn-sm btn-outline-success mt-3">
+                                    <i class="fab fa-spotify"></i> Open in Spotify
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-pause-circle fa-5x text-muted mb-3"></i>
+                            <h4 class="text-muted">Nothing playing right now</h4>
+                            <p class="text-muted">Start playing music on Spotify to see it here!</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Statistics Panels -->
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                
+                <!-- TOP TRACKS Card -->
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">
+                            <i class="fas fa-fire"></i> Top 5 Tracks
+                            <small class="float-right" style="font-size: 0.9rem;">Last 4 Weeks</small>
+                        </h4>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if spotify_data.top_tracks %}
+                        <ul class="list-group list-group-flush">
+                            {% for track in spotify_data.top_tracks %}
+                            <li class="list-group-item">
+                                <div class="row align-items-center">
+                                    <div class="col-md-1 text-center">
+                                        <h3 class="mb-0 text-primary">#{{ loop.index }}</h3>
+                                    </div>
+                                    <div class="col-md-2">
+                                        {% if track.album_image_url %}
+                                        <img src="{{ track.album_image_url }}" 
+                                             class="img-fluid rounded shadow-sm" 
+                                             alt="Album"
+                                             style="max-width: 60px;">
+                                        {% else %}
+                                        <div class="bg-light d-flex align-items-center justify-content-center rounded" 
+                                             style="width: 60px; height: 60px;">
+                                            <i class="fas fa-music text-muted"></i>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-7">
+                                        <strong>{{ track.name }}</strong><br>
+                                        <small class="text-muted">
+                                            <i class="fas fa-user"></i> {{ track.artist_name }}
+                                        </small><br>
+                                        <small class="text-muted">
+                                            <i class="fas fa-compact-disc"></i> {{ track.album_name }}
+                                        </small>
+                                    </div>
+                                    <div class="col-md-2 text-right">
+                                        {% if track.external_url %}
+                                        <a href="{{ track.external_url }}" target="_blank" class="btn btn-sm btn-outline-success">
+                                            <i class="fab fa-spotify"></i> Play
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <div class="text-center py-4">
+                            <p class="text-muted">No top tracks data available yet</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- TOP ARTISTS Card -->
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-warning text-dark">
+                        <h4 class="mb-0">
+                            <i class="fas fa-star"></i> Top 5 Artists
+                            <small class="float-right" style="font-size: 0.9rem;">Last 6 Months</small>
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        {% if spotify_data.top_artists %}
+                        <div class="row">
+                            {% for artist in spotify_data.top_artists %}
+                            <div class="col-md-4 mb-3">
+                                <div class="card h-100 shadow-sm">
+                                    <div class="card-body text-center">
+                                        <div class="position-absolute" style="top: 10px; left: 10px;">
+                                            <span class="badge badge-warning">#{{ loop.index }}</span>
+                                        </div>
+                                        {% if artist.image_url %}
+                                        <img src="{{ artist.image_url }}" 
+                                             class="img-fluid rounded-circle mb-3 shadow" 
+                                             alt="{{ artist.name }}"
+                                             style="max-width: 120px; height: 120px; object-fit: cover;">
+                                        {% else %}
+                                        <div class="bg-light rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" 
+                                             style="width: 120px; height: 120px;">
+                                            <i class="fas fa-user fa-3x text-muted"></i>
+                                        </div>
+                                        {% endif %}
+                                        <h6 class="mb-2">{{ artist.name }}</h6>
+                                        <small class="text-muted">
+                                            <i class="fas fa-chart-line"></i> Popularity: {{ artist.popularity }}/100
+                                        </small><br>
+                                        {% if artist.followers %}
+                                        <small class="text-muted">
+                                            <i class="fas fa-users"></i> {{ '{:,}'.format(artist.followers) }} followers
+                                        </small>
+                                        {% endif %}
+                                        {% if artist.external_url %}
+                                        <div class="mt-2">
+                                            <a href="{{ artist.external_url }}" target="_blank" class="btn btn-sm btn-outline-success">
+                                                <i class="fab fa-spotify"></i> View
+                                            </a>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="text-center py-4">
+                            <p class="text-muted">No top artists data available yet</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- TOP GENRES Card -->
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h4 class="mb-0">
+                            <i class="fas fa-list"></i> Top 5 Genres
+                            <small class="float-right" style="font-size: 0.9rem;">Based on Top Artists</small>
+                        </h4>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if spotify_data.top_genres %}
+                        <ul class="list-group list-group-flush">
+                            {% for genre_data in spotify_data.top_genres %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="badge badge-info mr-2">#{{ loop.index }}</span>
+                                    <strong style="font-size: 1.1rem;">{{ genre_data.genre | title }}</strong>
+                                </div>
+                                <span class="badge badge-info badge-pill" style="font-size: 1rem;">
+                                    {{ genre_data.count }} artist{{ 's' if genre_data.count != 1 else '' }}
+                                </span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <div class="text-center py-4">
+                            <p class="text-muted">No genre data available yet</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        
+        {% endif %}
+        <!-- End Spotify Data -->
+        
     </div>
 {% endblock %}
