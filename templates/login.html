@@ -8,10 +8,34 @@
                 <p>{{ msg }}</p>
             {% endfor %}
          {% endif %}
-        {% endwith %}
-<form action="#" method="post">
-    <p>Name:</p>
-    <p><input type="text" name="name" /></p>
-    <p><input type="submit" value="submit" /></p>
-
+    {% endwith %}
+    
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">Login to OpenGate</h2>
+                    
+                    <!-- Spotify Login Button -->
+                    <div class="mb-4">
+                        <a href="{{ url_for('main.spotify_login') }}" class="btn btn-success btn-lg btn-block">
+                            <i class="fab fa-spotify"></i> Login with Spotify
+                        </a>
+                        <p class="text-center text-muted mt-2">Recommended for full experience</p>
+                    </div>
+                    
+                    <hr>
+                    
+                    <!-- Traditional Login Form -->
+                    <form action="#" method="post">
+                        <div class="form-group">
+                            <label for="name">Or login with username:</label>
+                            <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name" required />
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

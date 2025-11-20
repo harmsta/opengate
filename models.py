@@ -1,4 +1,4 @@
-from .__init__ import db
+from .database import db
 
 class User(db.Model):
     __tablename__ = 'User'
@@ -8,6 +8,12 @@ class User(db.Model):
     
     name = db.Column(db.String(100))
     email = db.Column(db.String(100))
+    
+    # Spotify OAuth columns
+    spotify_id = db.Column(db.String(100), unique=True, nullable=True)
+    spotify_access_token = db.Column(db.String(512), nullable=True)
+    spotify_refresh_token = db.Column(db.String(512), nullable=True)
+    token_expires_at = db.Column(db.DateTime, nullable=True)
     
     # ORM Relationships
     listening_logs = db.relationship("Listening_Log", backref="user", lazy=True)

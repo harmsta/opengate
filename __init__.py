@@ -2,8 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from datetime import timedelta
 import os
-
-db = SQLAlchemy()
+from .database import db
 
 def create_app():
     app = Flask(__name__)
@@ -14,6 +13,10 @@ def create_app():
 
     DB_FILE_PATH = os.path.join(app.root_path, 'app_data.db')
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_FILE_PATH}'
+    
+    app.config['SPOTIFY_CLIENT_ID'] = os.environ.get("CLIENT_ID") 
+    app.config['SPOTIFY_CLIENT_SECRET'] = os.environ.get("CLIENT_SECRET") 
+    app.config['SPOTIFY_REDIRECT_URI'] = os.environ.get("SPOTIFY_REDIRECT_URI") 
     
     db.init_app(app)
 

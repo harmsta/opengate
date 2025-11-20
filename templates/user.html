@@ -3,13 +3,55 @@
 {% block content %}
     {% with messages = get_flashed_messages() %}
         {% if messages %}
-            {% for msg in messages %}
-                <p>{{ msg }}</p>
-            {% endfor %}
+            <div class="alert alert-info alert-dismissible fade show mt-3" role="alert">
+                {% for msg in messages %}
+                    {{ msg }}<br>
+                {% endfor %}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
          {% endif %}
-        {% endwith %}
-<form action="#" method="post">
-    <input type="email" name="email" placeholder="Enter your email" value="{{email if email}}"/>
-    <input type="submit" value="submit"/>
-</form>
+    {% endwith %}
+    
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">User Profile</h2>
+                    
+                    <!-- User Email Form -->
+                    <form action="#" method="post" class="mb-4">
+                        <div class="form-group">
+                            <label for="email">Email Address:</label>
+                            <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" value="{{email if email}}"/>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Email</button>
+                    </form>
+                    
+                    <hr>
+                    
+                    <!-- Spotify Connection Status -->
+                    <div class="mt-4">
+                        <h5>Spotify Connection</h5>
+                        {% if session.get('user') %}
+                            <p class="text-muted">Logged in as: <strong>{{ session.get('user') }}</strong></p>
+                        {% endif %}
+                        
+                        <a href="{{ url_for('main.spotify_login') }}" class="btn btn-success">
+                            <i class="fab fa-spotify"></i> Connect Spotify Account
+                        </a>
+                        <p class="text-muted mt-2">Link your Spotify account to access personalized features</p>
+                    </div>
+                    
+                    <hr>
+                    
+                    <!-- Logout Button -->
+                    <div class="mt-4">
+                        <a href="{{ url_for('main.logout') }}" class="btn btn-danger">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

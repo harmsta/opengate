@@ -2,7 +2,47 @@
 
 {% block title %}Home Page{% endblock %}
 {% block content %}
-    <p>This is the home page of OpenGate.fm. Enjoy your stay!</p>
+    <div class="jumbotron text-center mt-5">
+        <h1 class="display-4">Welcome to OpenGate.fm</h1>
+        <p class="lead">Connect your Spotify account and explore your music journey!</p>
+        <hr class="my-4">
+        <p>Track your listening habits, discover new music, and manage your playlists.</p>
+        <div class="mt-4">
+            <a class="btn btn-success btn-lg mr-2" href="{{ url_for('main.spotify_login') }}" role="button">
+                <i class="fab fa-spotify"></i> Connect with Spotify
+            </a>
+            <a class="btn btn-primary btn-lg" href="{{ url_for('main.login') }}" role="button">
+                Traditional Login
+            </a>
+        </div>
+    </div>
+    
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">🎵 Track Your Music</h5>
+                    <p class="card-text">Keep a log of everything you listen to and analyze your music taste.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">🎧 Discover Artists</h5>
+                    <p class="card-text">Explore new artists and genres based on your listening history.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">🏷️ Tag Your Tracks</h5>
+                    <p class="card-text">Organize your music with custom tags and categories.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
  
